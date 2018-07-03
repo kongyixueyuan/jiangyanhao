@@ -35,6 +35,7 @@ func (cli *CLI) Run (){
 	sendBlockCmd := flag.NewFlagSet("send",flag.ExitOnError)
 	printChainCmd := flag.NewFlagSet("printchain",flag.ExitOnError)
 	createBlockchainCmd := flag.NewFlagSet("createBlockchain",flag.ExitOnError)
+	getBalanceCmd := flag.NewFlagSet("getBalance",flag.ExitOnError)
 
 	flagCreateBlockchainWithAddress := createBlockchainCmd.String("address","","创建创世区块的地址")
 
@@ -58,13 +59,15 @@ func (cli *CLI) Run (){
 			log.Panic(err)
 		}
 	case "printchain":
-		Blockchain:=BlockchainObject()
-		Blockchain.Printchain()
 		err := printChainCmd.Parse(os.Args[2:])
 		if err != nil {
 			log.Panic(err)
 		}
-		defer Blockchain.BlockDB.Close()
+	case "getBalance":
+		err := getBalanceCmd.Parse(os.Args[2:])
+		if err != nil {
+			log.Panic(err)
+		}
 	default:
 		printUsage()
 		os.Exit(1)
@@ -94,11 +97,14 @@ func (cli *CLI) Run (){
 
 	}
 
-
 	if printChainCmd.Parsed() {
+		cli.printBlockChain()
 		fmt.Println("输出所有区块的数据........")
 	}
 
+	if getBalanceCmd.Parsed() {
+		fmt.Println("It's balance........")
+		cli.getBalance()
+	}
 
-	//	fmt.Println(genesisblock)
 }

@@ -70,6 +70,66 @@ func (blc *BlockChain) Printchain()  {
 
 }
 
+// 遍历输出所有区块的信息
+func (blc *BlockChain) getBalance()  {
+
+	blockchainIterator := blc.Iterator()
+
+
+	//把可花费的utxo算出来，都是output
+	//[Txhash][0,2]
+	spendableUTXO := FindSpendableUTXO(blc)
+	//var spendableTxout []*TXOutput
+	spendableMap := make(map[string][]*TXOutput)
+
+	balances := make(map[string]int64)
+	//看看from需要用哪几个output，算余额够不够
+	for {
+		block := blockchainIterator.Next()
+
+		for _, tx := range block.Transaction {
+			//1、计算block-spendable
+			//TXOut []*TXOutput
+			for i, txOut := range tx.TXOut {
+
+				for _, value := range spendableUTXO[string(tx.TxHash)] {
+					if (i == value) {
+						//	spendableTxout=append(spendableTxout, txOut)
+						spendableMap[string(tx.TxHash)] = append(spendableMap[string(tx.TxHash)], txOut)
+					}
+				}
+			}
+		}
+		var hashInt big.Int
+		hashInt.SetBytes(block.PrevBlockHash)
+
+		// Cmp compares x and y and returns:
+		//
+		//   -1 if x <  y
+		//    0 if x == y
+		//   +1 if x >  y
+
+		//	time.Sleep(1 * time.Second)
+		if big.NewInt(0).Cmp(&hashInt) == 0{
+			break;
+		}
+	}
+
+	for _, Txs := range spendableMap {
+		for _, txOut := range Txs {
+			balances[txOut.ScriptPubKey]=balances[txOut.ScriptPubKey]+txOut.Value
+		}
+	}
+
+	for name, balance := range balances{
+		fmt.Println(name,":",balance)
+	}
+
+
+
+}
+
+
 // 数据库名字
 const dbName  = "blockchain.db"
 
