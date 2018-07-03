@@ -13,8 +13,10 @@ type CLI struct {}
 func printUsage()  {
 
 	fmt.Println("Usage:")
-	fmt.Println("\taddblock -data DATA -- 交易数据.")
+	fmt.Println("\tcreateblockchain -address -- 交易数据.")
+	fmt.Println("\tsend -from FROM -to TO -amount AMOUNT -- 交易明细.")
 	fmt.Println("\tprintchain -- 输出区块信息.")
+	fmt.Println("\tgetbalance -address -- 输出区块信息.")
 
 }
 
@@ -30,30 +32,31 @@ func isValidArgs()  {
 func (cli *CLI) Run (){
 	isValidArgs()
 
-	addBlockCmd := flag.NewFlagSet("addBlock",flag.ExitOnError)
+	sendBlockCmd := flag.NewFlagSet("send",flag.ExitOnError)
 	printChainCmd := flag.NewFlagSet("printchain",flag.ExitOnError)
-	createBlockChainCmd := flag.NewFlagSet("createBlockchain",flag.ExitOnError)
+	createBlockchainCmd := flag.NewFlagSet("createBlockchain",flag.ExitOnError)
 
-	flagAddBlockData := addBlockCmd.String("data","http://liyuechun.org","交易数据......")
+	flagCreateBlockchainWithAddress := createBlockchainCmd.String("address","","创建创世区块的地址")
 
+	flagFrom := sendBlockCmd.String("from","","转账源地址......")
+	flagTo := sendBlockCmd.String("to","","转账目的地地址......")
+	flagAmount := sendBlockCmd.String("amount","","转账金额......")
 
-
+//./main send -from jiang -to li -amount 5
+//./main send -from ["jiang"] -to ["li"] -amount ["5"]
+//./main send -from {"jiang"} -to {"li"} -amount {"5"}
+//./main send -from '["jiang"]' -to '["li"]' -amount '["5"]'
 	switch os.Args[1] {
-	case "addBlock":
-		Blockchain:=BlockchainObject()
-		NewBlock([]byte("3rd"), Blockchain)
-		err := addBlockCmd.Parse(os.Args[2:])
+	case "send":
+		err := sendBlockCmd.Parse(os.Args[2:])
 		if err != nil {
 			log.Panic(err)
 		}
-		defer Blockchain.BlockDB.Close()
 	case "createBlockchain":
-		Blockchain:=cli.createBlockChain("put a genesis address")
-		err := createBlockChainCmd.Parse(os.Args[2:])
+		err := createBlockchainCmd.Parse(os.Args[2:])
 		if err != nil {
 			log.Panic(err)
 		}
-		defer Blockchain.BlockDB.Close()
 	case "printchain":
 		Blockchain:=BlockchainObject()
 		Blockchain.Printchain()
@@ -67,19 +70,33 @@ func (cli *CLI) Run (){
 		os.Exit(1)
 	}
 
-	if addBlockCmd.Parsed() {
-		if *flagAddBlockData == "" {
+	if sendBlockCmd.Parsed() {
+		if *flagFrom == "" || *flagTo == "" || *flagAmount == ""{
 			printUsage()
+			fmt.Println("00000000111111111")
 			os.Exit(1)
 		}
 
-		fmt.Println(*flagAddBlockData)
+		from := JSONToArray(*flagFrom)
+		to := JSONToArray(*flagTo)
+		amount := JSONToArray(*flagAmount)
+		cli.send(from,to,amount)
 	}
 
+	if createBlockchainCmd.Parsed() {
+
+		if *flagCreateBlockchainWithAddress == "" {
+			fmt.Println("地址不能为空....")
+			printUsage()
+			os.Exit(1)
+		}
+		cli.createBlockChain(*flagCreateBlockchainWithAddress)
+
+	}
+
+
 	if printChainCmd.Parsed() {
-
 		fmt.Println("输出所有区块的数据........")
-
 	}
 
 

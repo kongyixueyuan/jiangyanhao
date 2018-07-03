@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 	"math/big"
+	"os"
 )
 
 type BlockChain struct{
@@ -31,7 +32,7 @@ func (blc *BlockChain) Printchain()  {
 		fmt.Printf("Timestamp：%s\n",time.Unix(block.Timestamp, 0).Format("2006-01-02 03:04:05 PM"))
 		fmt.Printf("Hash：%x\n",block.BlockHash)
 		fmt.Printf("Nonce：%d\n",block.nonce)
-		fmt.Printf("Nonce：%x\n",IntToHex(block.nonce))
+		//fmt.Printf("Nonce：%x\n",IntToHex(block.nonce))
 
 		fmt.Println("Txs:")
 		for _, tx := range block.Transaction {
@@ -134,7 +135,11 @@ func NewBlockChain(block * Block) * BlockChain{
 	return blockchain
 }
 
-func AddToChain(block *Block, blockchain *BlockChain) *BlockChain{
+// 判断数据库是否存在
+func DBExists() bool {
+	if _, err := os.Stat(dbName); os.IsNotExist(err) {
+		return false
+	}
 
-	return blockchain
+	return true
 }

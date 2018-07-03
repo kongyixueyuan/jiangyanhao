@@ -32,9 +32,7 @@ func (tx *Transaction) HashTransaction()  {
 	tx.TxHash = hash[:]
 }
 
-func FindSpendableUTXO(blc *BlockChain) []*TXOutput{
-
-	var txOutputs []*TXOutput
+func FindSpendableUTXO(blc *BlockChain) map[string][]int{
 
 	blockchainIterator := blc.Iterator()
 	totalUTXO := make(map[string][]int)
@@ -43,7 +41,7 @@ func FindSpendableUTXO(blc *BlockChain) []*TXOutput{
 
 	for {
 		block := blockchainIterator.Next()
-
+		//[Txhash]{0,1,2}
 		for _, tx := range block.Transaction {
 			fmt.Println("it's typing Touts:")
 			for i, _ := range tx.TXOut {
@@ -54,6 +52,7 @@ func FindSpendableUTXO(blc *BlockChain) []*TXOutput{
 			//fmt.Println(spendableUTXO[string(tx.TxHash)]).flag≥encodingflag
 		}
 
+		////input:[Txhash][1]------>[Txhash][0,2]
 		for _, tx := range block.Transaction {
 			for _, in := range tx.TXIn {
 				for _ , value := range totalUTXO[string(tx.TxHash)]{
@@ -87,7 +86,7 @@ func FindSpendableUTXO(blc *BlockChain) []*TXOutput{
 
 
 
-	return txOutputs
+	return spendableUTXO
 }
 
 
