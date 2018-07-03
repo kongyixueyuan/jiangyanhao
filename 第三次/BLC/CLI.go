@@ -57,8 +57,6 @@ func (cli *CLI) Run (){
 	case "printchain":
 		Blockchain:=BlockchainObject()
 		Blockchain.Printchain()
-		FindUTXOOutput(Blockchain)
-
 		err := printChainCmd.Parse(os.Args[2:])
 		if err != nil {
 			log.Panic(err)

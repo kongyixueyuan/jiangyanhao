@@ -32,15 +32,14 @@ func (tx *Transaction) HashTransaction()  {
 	tx.TxHash = hash[:]
 }
 
-func FindUTXOOutput(blc *BlockChain) []*TXOutput{
+func FindSpendableUTXO(blc *BlockChain) []*TXOutput{
 
 	var txOutputs []*TXOutput
 
 	blockchainIterator := blc.Iterator()
-
+	totalUTXO := make(map[string][]int)
 	spendableUTXO := make(map[string][]int)
 
-	d := []int{};
 
 	for {
 		block := blockchainIterator.Next()
@@ -48,27 +47,21 @@ func FindUTXOOutput(blc *BlockChain) []*TXOutput{
 		for _, tx := range block.Transaction {
 			fmt.Println("it's typing Touts:")
 			for i, _ := range tx.TXOut {
-				d=append(d, i)
+				totalUTXO[string(tx.TxHash)]=append(totalUTXO[string(tx.TxHash)], i)
 				fmt.Println(i)
 			}
-			spendableUTXO[string(tx.TxHash)]=d
-			d = []int{}
 			//fmt.Println(tx.TxHash)
-			//fmt.Println(spendableUTXO[string(tx.TxHash)]).flag≥encoding≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥/*/*/*/*/*/*/*/*/*/*flag*/*/*/*/*/*/*/*/*/*/
+			//fmt.Println(spendableUTXO[string(tx.TxHash)]).flag≥encodingflag
 		}
 
 		for _, tx := range block.Transaction {
-			for i, in := range tx.TXIn {
-
-				spendableUTXO[string(tx.TxHash)]=append(spendableUTXO[string(tx.TxHash)][:i], spendableUTXO[string(tx.TxHash)][i+1:]...)
-				//重组
-
-				fmt.Printf("%x\n", in.TxHash)
-				fmt.Printf("%d\n", in.Vout)
-				fmt.Printf("%s\n", in.ScriptSig)
+			for _, in := range tx.TXIn {
+				for _ , value := range totalUTXO[string(tx.TxHash)]{
+					if(in.Vout!=value){
+						spendableUTXO[string(tx.TxHash)]= append(spendableUTXO[string(tx.TxHash)], value)
+					}
+				}
 			}
-			spendableUTXO[string(tx.TxHash)]=d
-			d = []int{}
 			//fmt.Println(tx.TxHash)
 			//fmt.Println(spendableUTXO[string(tx.TxHash)])
 		}
@@ -96,6 +89,7 @@ func FindUTXOOutput(blc *BlockChain) []*TXOutput{
 
 	return txOutputs
 }
+
 
 func SetCoinbBaseTransaction(address string) []*Transaction{
 	var txIntputs []*TXInput
