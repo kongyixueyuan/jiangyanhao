@@ -2,7 +2,6 @@ package BLC
 
 import(
 	"time"
-	"fmt"
 	"bytes"
 	"encoding/gob"
 	"log"
@@ -17,7 +16,7 @@ type Block struct{
 
 	PrevBlockHash []byte
 
-	nonce int64
+	Nonce int64
 
 	Transaction []*Transaction
 
@@ -60,11 +59,12 @@ func (block *Block) Serialize() []byte {
 	encoder := gob.NewEncoder(&result)
 
 	err := encoder.Encode(block)
-	fmt.Println("in serialize, %d",block.nonce)
+	//fmt.Println("in serialize, %d",block.Nonce)
 	if err != nil {
 		log.Panic(err)
 	}
 
+	//fmt.Println("/////////in serialize, %d",DeserializeBlock(result.Bytes()))
 	return result.Bytes()
 }
 
@@ -75,7 +75,7 @@ func DeserializeBlock(blockBytes []byte) *Block {
 
 	decoder := gob.NewDecoder(bytes.NewReader(blockBytes))
 	err := decoder.Decode(&block)
-	fmt.Println("in deserialize, %d",block.nonce)
+	//fmt.Println("---------in deserialize, %d",block.Nonce)
 
 	if err != nil {
 		log.Panic(err)
@@ -107,7 +107,7 @@ func NewBlock(Transaction []*Transaction, blockchain *BlockChain){
 
 			Pow:=ProofOfWork(newBlock)
 			nonce, hash := Pow.run()
-			newBlock.nonce=nonce
+			newBlock.Nonce=nonce
 			newBlock.BlockHash=hash[:]
 			//fmt.Println("it's hash+++++++++++,%s,%s",hex.EncodeToString(hash),hex.EncodeToString(newBlock.BlockHash))
 
@@ -245,7 +245,7 @@ func NewGenesisBlock(address string) * Block{
 	nonce, hash := Pow.run()
 
 	block.BlockHash=hash[:]
-	block.nonce=nonce
+	block.Nonce=nonce
 
 	//PrintBlock(block)
 	return block
