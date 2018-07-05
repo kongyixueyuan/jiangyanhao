@@ -75,7 +75,7 @@ func DeserializeBlock(blockBytes []byte) *Block {
 
 	decoder := gob.NewDecoder(bytes.NewReader(blockBytes))
 	err := decoder.Decode(&block)
-	//fmt.Println("in deserialize, %d",block.nonce)
+	fmt.Println("in deserialize, %d",block.nonce)
 
 	if err != nil {
 		log.Panic(err)
@@ -103,14 +103,14 @@ func NewBlock(Transaction []*Transaction, blockchain *BlockChain){
 			//PrintBlock(block)
 
 			//3. 将区块序列化并且存储到数据库中
-			newBlock :=&Block{block.Height+1, block.BlockHash,1,Transaction,time.Now().Unix(),nil}
+			newBlock :=&Block{block.Height+1, block.BlockHash,0,Transaction,time.Now().Unix(),nil}
 
 			Pow:=ProofOfWork(newBlock)
 			nonce, hash := Pow.run()
-
+			newBlock.nonce=nonce
 			newBlock.BlockHash=hash[:]
 			//fmt.Println("it's hash+++++++++++,%s,%s",hex.EncodeToString(hash),hex.EncodeToString(newBlock.BlockHash))
-			newBlock.nonce=nonce
+
 			//fmt.Println("it's nonce+++++++++++,%d",nonce)
 			//fmt.Println("it's newBlock nonce+++++++++++,%d",newBlock.nonce)
 			err := b.Put(newBlock.BlockHash,newBlock.Serialize())
@@ -239,7 +239,7 @@ func MineNewBlock(from []string, to []string, amount []string, blockchain *Block
 }
 func NewGenesisBlock(address string) * Block{
 	GenesisTransaction:=SetCoinbBaseTransaction(address)
-	block := &Block{1,IntToHex(0),1,GenesisTransaction,time.Now().Unix(),nil}
+	block := &Block{1,IntToHex(0),0,GenesisTransaction,time.Now().Unix(),nil}
 
 	Pow:=ProofOfWork(block)
 	nonce, hash := Pow.run()

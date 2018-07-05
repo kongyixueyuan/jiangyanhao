@@ -32,6 +32,7 @@ func (blc *BlockChain) Printchain()  {
 		fmt.Printf("Timestamp：%s\n",time.Unix(block.Timestamp, 0).Format("2006-01-02 03:04:05 PM"))
 		fmt.Printf("Hash：%x\n",block.BlockHash)
 		fmt.Printf("Nonce：%d\n",block.nonce)
+		fmt.Println(block.nonce)
 		//fmt.Printf("Nonce：%x\n",IntToHex(block.nonce))
 
 		fmt.Println("Txs:")
@@ -83,7 +84,6 @@ func (blc *BlockChain) getBalance()  {
 	spendableMap := make(map[string][]*TXOutput)
 
 	balances := make(map[string]int64)
-	//看看from需要用哪几个output，算余额够不够
 	for {
 		block := blockchainIterator.Next()
 
@@ -177,6 +177,7 @@ func NewBlockChain(block * Block) * BlockChain{
 				log.Panic(err)
 			}
 		}
+		fmt.Println("new blockchain:%d",block.nonce)
 
 		err = b.Put(block.BlockHash, block.Serialize())
 		if err != nil{
