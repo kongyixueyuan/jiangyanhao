@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 	"math/big"
+	"os"
 )
 
 type BlockChain struct{
@@ -30,8 +31,9 @@ func (blc *BlockChain) Printchain()  {
 		fmt.Printf("PrevBlockHash：%x\n",block.PrevBlockHash)
 		fmt.Printf("Timestamp：%s\n",time.Unix(block.Timestamp, 0).Format("2006-01-02 03:04:05 PM"))
 		fmt.Printf("Hash：%x\n",block.BlockHash)
-		fmt.Printf("Nonce：%d\n",block.nonce)
-		fmt.Printf("Nonce：%x\n",IntToHex(block.nonce))
+		fmt.Printf("Nonce：%d\n",block.Nonce)
+		//fmt.Println(block.Nonce)
+		//fmt.Printf("Nonce：%x\n",IntToHex(block.nonce))
 
 		fmt.Println("Txs:")
 		for _, tx := range block.Transaction {
@@ -68,6 +70,65 @@ func (blc *BlockChain) Printchain()  {
 	}
 
 }
+
+// 遍历输出所有区块的信息
+func (blc *BlockChain) getBalance()  {
+
+	blockchainIterator := blc.Iterator()
+
+
+	//把可花费的utxo算出来，都是output
+	//[Txhash][0,2]
+	spendableUTXO := FindSpendableUTXO(blc)
+	//var spendableTxout []*TXOutput
+	spendableMap := make(map[string][]*TXOutput)
+
+	balances := make(map[string]int64)
+	for {
+		block := blockchainIterator.Next()
+
+		for _, tx := range block.Transaction {
+			//1、计算block-spendable
+			//TXOut []*TXOutput
+			for i, txOut := range tx.TXOut {
+
+				for _, value := range spendableUTXO[string(tx.TxHash)] {
+					if (i == value) {
+						//	spendableTxout=append(spendableTxout, txOut)
+						spendableMap[string(tx.TxHash)] = append(spendableMap[string(tx.TxHash)], txOut)
+					}
+				}
+			}
+		}
+		var hashInt big.Int
+		hashInt.SetBytes(block.PrevBlockHash)
+
+		// Cmp compares x and y and returns:
+		//
+		//   -1 if x <  y
+		//    0 if x == y
+		//   +1 if x >  y
+
+		//	time.Sleep(1 * time.Second)
+		if big.NewInt(0).Cmp(&hashInt) == 0{
+			break;
+		}
+	}
+
+	for _, Txs := range spendableMap {
+		for _, txOut := range Txs {
+			balances[txOut.ScriptPubKey]=balances[txOut.ScriptPubKey]+txOut.Value
+		}
+	}
+
+	for name, balance := range balances{
+		fmt.Println(name,":",balance)
+	}
+
+
+
+}
+
 
 // 数据库名字
 const dbName  = "blockchain.db"
@@ -116,8 +177,11 @@ func NewBlockChain(block * Block) * BlockChain{
 				log.Panic(err)
 			}
 		}
-
-		err = b.Put(block.BlockHash, block.Serialize())
+		//fmt.Println("new blockchain:%d",block.Nonce)
+		ss:=block.Serialize()
+		//fmt.Println("in new chain",DeserializeBlock(ss).Nonce)
+		err = b.Put(block.BlockHash, ss)
+		//fmt.Println("ss deserialize",DeserializeBlock(ss).Nonce)
 		if err != nil{
 			log.Panic(err)
 		}
@@ -134,7 +198,11 @@ func NewBlockChain(block * Block) * BlockChain{
 	return blockchain
 }
 
-func AddToChain(block *Block, blockchain *BlockChain) *BlockChain{
+// 判断数据库是否存在
+func DBExists() bool {
+	if _, err := os.Stat(dbName); os.IsNotExist(err) {
+		return false
+	}
 
-	return blockchain
+	return true
 }

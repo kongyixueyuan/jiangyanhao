@@ -2,7 +2,7 @@ package BLC
 
 func (cli *CLI) createBlockChain(address string) *BlockChain{
 
-	genesisblock := NewGenesisBlock("jiang")
+	genesisblock := NewGenesisBlock(address)
 	Blockchain := NewBlockChain(genesisblock)
 
 	return Blockchain
