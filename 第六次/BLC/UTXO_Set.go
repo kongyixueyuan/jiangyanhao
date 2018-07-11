@@ -115,34 +115,46 @@ func (utxoSet *jyh_UTXOSet) jyh_FindSpendableUTXOS(from string,amount int64,txs 
 //./main getBalance -address "1Gr8d9YMXPGNUsoQkX3N2r3qJGSnwfYzdM"
 func (utxoSet *jyh_UTXOSet) jyh_findUTXOForAddress(address string) []*UTXO{
 
-
+	fmt.Println("11111111111")
 	var utxos []*UTXO
 
-	utxoSet.Blockchain.BlockDB.View(func(tx *bolt.Tx) error {
-
+	err:= utxoSet.Blockchain.BlockDB.View(func(tx *bolt.Tx) error {
+		fmt.Println("22222222")
 		b := tx.Bucket([]byte(utxoTableName))
-
+		fmt.Println("333333")
 		// 游标
 		c := b.Cursor()
 
 		for k, v := c.First(); k != nil; k, v = c.Next() {
 
 			txOutputs := DeserializeTXOutputs(v)
-
+			fmt.Println(txOutputs)
 			for _,utxo := range txOutputs.UTXOS  {
+				//fmt.Println(utxo)
+				//fmt.Println(utxo.Output.Ripemd160Hash)
+				//fmt.Printf("address:%s\n",address)
+				//publicKeyHash := Base58Decode([]byte(address))
+				//hash160 := publicKeyHash[1:len(publicKeyHash) - 4]
+				//fmt.Printf("hash160:%x\n",hash160)
 
 				if utxo.Output.IsLockedPubkeyTxOut(address) {
+
 					utxos = append(utxos,utxo)
+					fmt.Println(utxo.Output.Ripemd160Hash)
+					fmt.Printf("address:%s\n",address)
 				}
 			}
 		}
 		fmt.Printf("length:%d\n",len(utxos))
-		for _,v := range utxos{
+		/*for _,v := range utxos{
 			fmt.Printf("tx hash:%x,\nindex:%d,\n",v.TxHash,v.Index)
 			fmt.Printf("it's value:%d, and 160hash: %d",v.Output.Value,v.Output.Ripemd160Hash)
-		}
+		}*/
 		return nil
 	})
+	if(err!=nil){
+		fmt.Println("err is not nil!!!")
+	}
 
 
 	return utxos

@@ -21,8 +21,9 @@ func (TxOut *TXOutput) IsLockedPubkeyTxOut (address string) bool {
 	publicKeyHash := Base58Decode([]byte(address))
 	hash160 := publicKeyHash[1:len(publicKeyHash) - 4]
 
-	return bytes.Compare(TxOut.Ripemd160Hash,hash160) == 0
+	return bytes.Compare(TxOut.Ripemd160Hash,hash160) == 1
 }
+//./main getBalance -address "
 
 func NewTXOutput(value int64,address string) *TXOutput {
 

@@ -431,6 +431,11 @@ func BlockchainObject() *BlockChain {
 //1KaJiPpYWzY2JgCrnr1T7newEK3xkwZmSG
 //./main createBlockchain "13s5ZSMxyxmRNuaHEWdkpE2yQruahZ2VdJ"
 func NewBlockChain(block * Block) * BlockChain{
+	// 判断数据库是否存在
+	if DBExists() {
+		fmt.Println("创世区块已经存在.......")
+		os.Exit(1)
+	}
 
 	db, err := bolt.Open(dbName, 0600, nil)
 	if err != nil {
@@ -448,10 +453,8 @@ func NewBlockChain(block * Block) * BlockChain{
 				log.Panic(err)
 			}
 		}
-		//fmt.Println("new blockchain:%d",block.Nonce)
-		ss:=block.jyh_Serialize()
 		//fmt.Println("in new chain",DeserializeBlock(ss).Nonce)
-		err = b.Put(block.BlockHash, ss)
+		err = b.Put(block.BlockHash, block.jyh_Serialize())
 		//fmt.Println("ss deserialize",DeserializeBlock(ss).Nonce)
 		if err != nil{
 			log.Panic(err)
@@ -532,7 +535,8 @@ func (blc *BlockChain)jyh_FindUTXOMap() map[string]*TXOutputs{
 
 						outPublicKey := out.Ripemd160Hash
 						inPublicKey := in.PubKey
-
+						fmt.Println("outPubkey:%s",out.Ripemd160Hash)
+						fmt.Println("inPubkey:%s",in.PubKey)
 						if bytes.Compare(outPublicKey,HashPubKey(inPublicKey)) == 0{
 							if index == in.Vout {
 								isSpent = true
@@ -572,7 +576,8 @@ func (blc *BlockChain)jyh_FindUTXOMap() map[string]*TXOutputs{
 
 	return utxoMaps
 }
-	/*
+	/*./main createBlockchain "1JnMQYJaXFkWXCjFrCokMqfk66J7FYmWbn"
+
 func (blc *BlockChain)FindUTXOMap() map[string]*TXOutputs{
 	UTXOMap := make(map[string]*TXOutputs)
 	spentableUTXOsMap := make(map[string][]*TXInput)
@@ -657,6 +662,7 @@ func (blockchain *BlockChain) jyh_FindSpendableUTXOS(from string, amount int,txs
 }
 
 
+//./main send -from '["1JnMQYJaXFkWXCjFrCokMqfk66J7FYmWbn"]' -to '["14y6Dxyyo6Eh3JYFMVRVG6wK3M3Sm6m4Qo"]' -amount '["2"]'
 // 挖掘新的区块
 func (blockchain *BlockChain) jyh_MineNewBlock(from []string, to []string, amount []string) {
 	//	$ ./bc send -from '["juncheng"]' -to '["zhangqiang"]' -amount '["2"]'
