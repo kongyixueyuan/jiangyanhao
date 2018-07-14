@@ -669,7 +669,12 @@ func (blockchain *Jyh_BlockChain) Jyh_FindSpendableUTXOS(from string, amount int
 }
 
 
-//./main send -from '["1JnMQYJaXFkWXCjFrCokMqfk66J7FYmWbn"]' -to '["14y6Dxyyo6Eh3JYFMVRVG6wK3M3Sm6m4Qo"]' -amount '["2"]'
+//./main send -from '["1AT8vEUJWbdA9J7nNSBqmxJcrYmEqMFcYY"]' -to '["199mwdskttaV3v7K7ezWyRe6mU6XHNeoMn"]' -amount '["2"]' -mine
+//./main send -from '["1AT8vEUJWbdA9J7nNSBqmxJcrYmEqMFcYY"]' -to '["1DZhVyKBJGjJteCX49V2jWnfgKCh81gueG"]' -amount '["4"]' -mine
+
+//./main send -from '["1DZhVyKBJGjJteCX49V2jWnfgKCh81gueG"]' -to '["1NVX8kVVV282dqxrzGiQgVfJPAVtzGfD8W"]' -amount '["1"]' -mine
+
+//./main send -from ADDRESS1 -to ADDRESS3 -amount 5
 // 挖掘新的区块
 func (blockchain *Jyh_BlockChain) Jyh_MineNewBlock(from []string, to []string, amount []string,nodeID string) {
 	//	$ ./bc send -from '["juncheng"]' -to '["zhangqiang"]' -amount '["2"]'

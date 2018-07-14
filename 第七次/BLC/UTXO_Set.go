@@ -128,19 +128,19 @@ func (utxoSet *Jyh_UTXOSet) Jyh_findUTXOForAddress(address string) []*Jyh_UTXO{
 		for k, v := c.First(); k != nil; k, v = c.Next() {
 
 			txOutputs := DeserializeTXOutputs(v)
-			fmt.Println(txOutputs)
-			fmt.Printf("length of UTXOS:%d",len(txOutputs.Jyh_UTXOS))
+//			fmt.Println(txOutputs)
+//			fmt.Printf("length of UTXOS:%d",len(txOutputs.Jyh_UTXOS))
 			for _,utxo := range txOutputs.Jyh_UTXOS  {
 
 				if utxo.Jyh_Output.Jyh_IsLockedPubkeyTxOut(address) {
 
 					utxos = append(utxos,utxo)
-					fmt.Println(utxo.Jyh_Output.Jyh_Ripemd160Hash)
-					fmt.Printf("address:%s\n",address)
+//					fmt.Println(utxo.Jyh_Output.Jyh_Ripemd160Hash)
+//					fmt.Printf("address:%s\n",address)
 				}
 			}
 		}
-		fmt.Printf("length:%d\n",len(utxos))
+//		fmt.Printf("length:%d\n",len(utxos))
 		/*for _,v := range utxos{
 			fmt.Printf("tx hash:%x,\nindex:%d,\n",v.TxHash,v.Index)
 			fmt.Printf("it's value:%d, and 160hash: %d",v.Output.Value,v.Output.Ripemd160Hash)

@@ -2,7 +2,6 @@ package BLC
 
 import (
 	"bytes"
-	"fmt"
 )
 
 //TXOutput{100,"zhangbozhi"}
@@ -35,8 +34,8 @@ func NewTXOutput(value int64,address string) *Jyh_TXOutput {
 
 	// 设置Ripemd160Hash
 	txOutput.Jyh_Lock(address)
-	fmt.Printf("rimp::::%x\n",txOutput.Jyh_Ripemd160Hash)
-	fmt.Printf("address::::%s\n",address)
+//	fmt.Printf("rimp::::%x\n",txOutput.Jyh_Ripemd160Hash)
+//	fmt.Printf("address::::%s\n",address)
 
 //rimp::::67aa8e771cb30d9f3cfd04c770e55cd0af912944
 //address::::1AT8vEUJWbdA9J7nNSBqmxJcrYmEqMFcYY
